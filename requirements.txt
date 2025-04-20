@@ -1,0 +1,7 @@
+langchain
+streamlit
+git
+pathlib
+typing
+langchain.vectorstores
+boto3

@@ -1,4 +1,4 @@
-from embeddings import bedrock
+from bedrock_client import bedrock
 import json
 import re
 import os
@@ -46,7 +46,7 @@ def ask_llama(context, prompt, repo_path):
     Updated content here
     </file_update>
 
-    IMPORTANT: You can use either absolute paths or paths relative to the repository root.
+    use either absolute paths or paths relative to the repository root.
     Current repository path: {repo_path}
 
     The following are code snippets from a project:

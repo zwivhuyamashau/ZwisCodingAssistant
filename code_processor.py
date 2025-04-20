@@ -1,4 +1,3 @@
-# code_processor.py
 from pathlib import Path
 
 def get_code_chunks(repo_path, extensions=(".py", ".js", ".ts",".md"), chunk_size=500):

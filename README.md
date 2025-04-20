@@ -6,10 +6,10 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
 
 ## 🚀 Features
 
-- Clone and analyze any GitHub repository  
-- Extract and embed code using Amazon Titan embeddings  
-- Search for relevant code using FAISS  
-- Interact with LLMs for insightful code explanations or modifications  
+- Clone and analyze any GitHub repository
+- Extract and embed code using Amazon Titan embeddings
+- Search for relevant code using FAISS
+- Interact with LLMs for insightful code explanations or modifications
 - Choose between a **CLI** or **Streamlit-based Chat Interface**
 
 ---
@@ -19,12 +19,13 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
 ### CLI Interface
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/zwi-coding-assistant.git
    cd zwi-coding-assistant
    ```
 
-2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`  
+2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 3. Run the CLI:
    ```bash
    python cli_main.py
@@ -35,12 +36,13 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
 ### Streamlit Interface
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/zwi-coding-assistant.git
    cd zwi-coding-assistant
    ```
 
-2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`  
+2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 3. Launch the Streamlit app:
    ```bash
    streamlit run streamlit_main.py
@@ -110,9 +112,9 @@ export AWS_SECRET_ACCESS_KEY="your_secret_key"
 
 The project is under active development. Planned features include:
 
-- ✅ Enhanced **Streamlit UI** with better usability and responsiveness  
-- 🔄 Support for **multiple LLMs** (e.g., OpenAI, Anthropic, Mistral, etc.)  
-- ✍️ Advanced **file writing and review** capabilities  
-- 📄 Integration of **PDF and web scraping** for richer context  
+- ✅ Enhanced **Streamlit UI** with better usability and responsiveness
+- 🔄 Support for **multiple LLMs** (e.g., OpenAI, Anthropic, Mistral, etc.)
+- ✍️ Advanced **file writing and review** capabilities
+- 📄 Integration of **PDF and web scraping** for richer context
 
 ---

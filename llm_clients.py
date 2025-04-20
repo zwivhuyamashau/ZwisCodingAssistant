@@ -26,61 +26,70 @@ def extract_file_updates(response: str) -> list:
 
     return updates
 
-def ask_llama(context, prompt, repo_path):
+def ask_llm(context, prompt, repo_path, model="llama"):
     """
-    Send a prompt to the LLM and process any file updates.
+    Sends a prompt to the chosen LLM and applies file updates.
 
     Args:
-        context: The code context to provide to the LLM
-        prompt: The user's prompt/question
-        repo_path: Path to the git repository for file operations
+        context: Code context to send to the LLM
+        prompt: User question
+        repo_path: Root path of the code repo
+        model: Choose between "llama", "claude", "openai" (default: llama)
 
     Returns:
-        str: The LLM's response
+        str: LLM's raw response + any error messages
     """
-    # Initialize file manager with repository path
     file_manager = RepoFileManager(repo_path)
 
-    full_prompt = f"""Human: You are a coding assistant that can read and modify code. When you need to update a file, wrap the content in XML tags:
+    system_prompt = f"""You are a coding agent that reads and modifies code.
+    When editing files, respond using this format:
+
     <file_update path="/path/to/file">
-    Updated content here
+    updated content here
     </file_update>
 
-    use either absolute paths or paths relative to the repository root.
-    Current repository path: {repo_path}
+    Use absolute or repo-relative paths.
+    Repository path: {repo_path}
 
-    The following are code snippets from a project:
+    Code snippets:
     {context}
 
-    User question: {prompt}
+    User request: {prompt}
+    """
 
-    Assistant:"""
+    if model == "llama":
+        body = {
+            "prompt": f"Human: {system_prompt}\nAssistant:",
+            "temperature": 0.5
+        }
 
-    body = {
-        "prompt": full_prompt,
-        "temperature": 0.5
-    }
+        response = bedrock.invoke_model(
+            modelId="meta.llama3-70b-instruct-v1:0",
+            contentType="application/json",
+            accept="application/json",
+            body=json.dumps(body)
+        )
 
-    response = bedrock.invoke_model(
-        modelId="meta.llama3-70b-instruct-v1:0",
-        contentType="application/json",
-        accept="application/json",
-        body=json.dumps(body)
-    )
+        result = json.loads(response["body"].read())
+        response_text = result.get("generation", "No output received.")
 
-    result = json.loads(response["body"].read())
-    response_text = result.get("generation", "No output received.")
+    elif model == "claude":
+        # Add Claude logic here
+        response_text = "Claude is not yet implemented."
 
-    # Process any file updates
-    updates = extract_file_updates(response_text)
+    elif model == "openai":
+        # Add OpenAI logic here
+        response_text = "OpenAI is not yet implemented."
 
-    for file_path, content in updates:
+    else:
+        return f"Unknown model: {model}"
+
+    # Handle file updates
+    for file_path, content in extract_file_updates(response_text):
         try:
             file_manager.safe_write_to_file(file_path, content)
         except FileOperationError as e:
             print(f"✗ Failed to update file: {file_path}")
-            print(f"  Error: {str(e)}")
-            # Add error information to the response
             response_text += f"\n\nError updating {file_path}: {str(e)}"
 
     return response_text

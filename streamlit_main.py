@@ -2,9 +2,9 @@ import os
 import streamlit as st
 from github_fetcher import clone_repo
 from code_processor import get_code_chunks
-from embeddings import get_titan_embedding
-from vector_store import FAISSVectorStore
-from llm_clients import ask_llama
+from embeddings import TitanEmbeddings
+from langchain.vectorstores import FAISS
+from llm_clients import ask_llm
 from memory import ConversationMemory
 from file_operations import RepoFileManager
 
@@ -34,6 +34,8 @@ if 'conversation_memory' not in st.session_state:
     st.session_state.conversation_memory = ConversationMemory()
 if 'vector_store' not in st.session_state:
     st.session_state.vector_store = None
+if 'embedding_model' not in st.session_state:
+    st.session_state.embedding_model = TitanEmbeddings()
 if 'repo_cloned' not in st.session_state:
     st.session_state.repo_cloned = False
 if 'chat_history' not in st.session_state:
@@ -106,11 +108,15 @@ def main():
                         st.write("🔍 Analyzing code structure...")
                         chunks = get_code_chunks(repo_name)
                         
-                        st.write("🧠 Generating embeddings...")
-                        dim = 1024
-                        embeddings = [get_titan_embedding(chunk[1]) for chunk in chunks]
-                        st.session_state.vector_store = FAISSVectorStore(dim)
-                        st.session_state.vector_store.add(embeddings, chunks)
+                        st.write("🧠 Indexing codebase...")
+                        texts = [chunk[1] for chunk in chunks]
+                        metadatas = [{"path": chunk[0]} for chunk in chunks]
+                        
+                        st.session_state.vector_store = FAISS.from_texts(
+                            texts=texts,
+                            metadatas=metadatas,
+                            embedding=st.session_state.embedding_model
+                        )
                         
                         status.update(label="Repository ready!", state="complete")
                         st.session_state.repo_cloned = True
@@ -148,8 +154,12 @@ def main():
                 try:
                     # Context retrieval
                     st.write("🔎 Searching code context...")
-                    query_embedding = get_titan_embedding(prompt)
-                    relevant_chunks = st.session_state.vector_store.search(query_embedding, top_k=20)
+                    query_embedding = st.session_state.embedding_model.embed_query(prompt)
+                    relevant_docs = st.session_state.vector_store.similarity_search_by_vector(
+                        query_embedding, 
+                        k=20
+                    )
+                    relevant_chunks = [(doc.metadata['path'], doc.page_content) for doc in relevant_docs]
                     context = "\n\n".join([f"**{path}**:\n```{code}```" for path, code in relevant_chunks])
                     
                     # Generate response
@@ -160,7 +170,7 @@ def main():
                          for ih in recent_history]
                     )
                     full_prompt = f"{history_text}\nUser: {prompt}\nContext:\n{context}\nAssistant:"
-                    response = ask_llama(context, full_prompt, st.session_state.repo_path)
+                    response = ask_llm(context, full_prompt, st.session_state.repo_path)
                     
                     # Update conversation
                     st.session_state.conversation_memory.add_interaction(prompt, context, response)
@@ -169,9 +179,13 @@ def main():
                     # Refresh index
                     st.write("🔄 Updating code index...")
                     chunks = get_code_chunks(st.session_state.repo_path)
-                    embeddings = [get_titan_embedding(chunk[1]) for chunk in chunks]
-                    st.session_state.vector_store = FAISSVectorStore(1024)
-                    st.session_state.vector_store.add(embeddings, chunks)
+                    texts = [chunk[1] for chunk in chunks]
+                    metadatas = [{"path": chunk[0]} for chunk in chunks]
+                    st.session_state.vector_store = FAISS.from_texts(
+                        texts=texts,
+                        metadatas=metadatas,
+                        embedding=st.session_state.embedding_model
+                    )
                     
                     status.update(label="Response ready!", state="complete")
                 except Exception as e:

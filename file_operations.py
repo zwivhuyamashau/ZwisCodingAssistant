@@ -8,13 +8,6 @@ class FileOperationError(Exception):
 
 class RepoFileManager:
     def __init__(self, repo_base_path: str = None):
-        """
-        Initialize with the base path of the git repository.
-        If no path is provided, uses current working directory.
-
-        Args:
-            repo_base_path: Absolute or relative path to the git repository
-        """
         if repo_base_path is None:
             repo_base_path = os.getcwd()
 
@@ -27,15 +20,6 @@ class RepoFileManager:
         print(f"File operations initialized with base path: {self.repo_base_path}")
 
     def get_absolute_path(self, file_path: str) -> str:
-        """
-        Convert a relative or absolute path to an absolute path within the repository.
-
-        Args:
-            file_path: Relative or absolute path to convert
-
-        Returns:
-            str: Normalized absolute path
-        """
         # If path is already absolute, use it directly
         if os.path.isabs(file_path):
             abs_path = os.path.normpath(file_path)
@@ -46,18 +30,7 @@ class RepoFileManager:
         return abs_path
 
     def validate_path(self, file_path: str) -> str:
-        """
-        Validate and normalize the file path to ensure it's within the repository.
 
-        Args:
-            file_path: Path to validate
-
-        Returns:
-            str: Normalized absolute path
-
-        Raises:
-            FileOperationError: If path is outside repository or contains invalid characters
-        """
         abs_path = self.get_absolute_path(file_path)
 
         # Check if path is within repository
@@ -79,19 +52,6 @@ class RepoFileManager:
         return abs_path
 
     def safe_write_to_file(self, file_path: str, content: str) -> bool:
-        """
-        Safely write content to a file within the repository.
-
-        Args:
-            file_path: Absolute or relative path to the file to write
-            content: Content to write to the file
-
-        Returns:
-            bool: True if write was successful
-
-        Raises:
-            FileOperationError: If path validation fails or write fails
-        """
         try:
             # Validate and normalize path
             abs_path = self.validate_path(file_path)
@@ -105,7 +65,7 @@ class RepoFileManager:
             with open(abs_path, 'w') as f:
                 f.write(content)
 
-            print(f"✓ Successfully wrote to file: {abs_path}")
+            print(f" Successfully wrote to file: {abs_path}")
             return True
 
         except FileOperationError:
@@ -114,18 +74,6 @@ class RepoFileManager:
             raise FileOperationError(f"Error writing to file {file_path}: {str(e)}")
 
     def read_file(self, file_path: str) -> Optional[str]:
-        """
-        Read content from a file within the repository.
-
-        Args:
-            file_path: Absolute or relative path to the file to read
-
-        Returns:
-            str: Content of the file or None if file doesn't exist
-
-        Raises:
-            FileOperationError: If path validation fails or read fails
-        """
         try:
             # Validate and normalize path
             abs_path = self.validate_path(file_path)
@@ -142,15 +90,6 @@ class RepoFileManager:
             raise FileOperationError(f"Error reading file {file_path}: {str(e)}")
 
     def is_file_in_repo(self, file_path: str) -> bool:
-        """
-        Check if a file path is within the repository directory.
-
-        Args:
-            file_path: Absolute or relative path to check
-
-        Returns:
-            bool: True if path is within repository
-        """
         try:
             self.validate_path(file_path)
             return True
@@ -158,15 +97,6 @@ class RepoFileManager:
             return False
 
     def get_relative_path(self, abs_path: str) -> str:
-        """
-        Convert an absolute path to a path relative to the repository root.
-
-        Args:
-            abs_path: Absolute path to convert
-
-        Returns:
-            str: Path relative to repository root
-        """
         try:
             return os.path.relpath(abs_path, self.repo_base_path)
         except ValueError:

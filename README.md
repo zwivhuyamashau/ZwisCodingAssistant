@@ -42,7 +42,7 @@ The user can continue interacting with the assistant by entering additional quer
 
 ## Requirements
 - Python 3.x
-- Necessary Python libraries (e.g., `faiss`, `requests`, `openai`)
+- Necessary Python libraries (e.g., `faiss`, `requests`, `bedrock`)
 
 
 

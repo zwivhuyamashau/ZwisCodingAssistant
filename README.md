@@ -21,7 +21,7 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/zwi-coding-assistant.git
+   git clone https://github.com/zwivhuyamashau/ZwisCodingAssistant
    cd zwi-coding-assistant
    ```
 
@@ -38,7 +38,7 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/zwi-coding-assistant.git
+   git clone https://github.com/zwivhuyamashau/ZwisCodingAssistant
    cd zwi-coding-assistant
    ```
 
@@ -101,7 +101,6 @@ export AWS_SECRET_ACCESS_KEY="your_secret_key"
 - **`github_fetcher.py`** – Clones a GitHub repository.
 - **`code_processor.py`** – Extracts and segments code into manageable chunks.
 - **`embeddings.py`** – Generates embeddings using Amazon Titan.
-- **`vector_store.py`** – Stores and retrieves vectors using FAISS.
 - **`llm_clients.py`** – Interfaces with a Large Language Model for generating responses.
 - **`memory.py`** – Maintains session history to improve conversational context.
 - **`file_operations.py`** – Modifies files based on user instructions.
@@ -114,7 +113,7 @@ The project is under active development. Planned features include:
 
 - ✅ Enhanced **Streamlit UI** with better usability and responsiveness
 - 🔄 Support for **multiple LLMs** (e.g., OpenAI, Anthropic, Mistral, etc.)
-- ✍️ Advanced **file writing and review** capabilities
+- ✍️ Improve **file writing and review** capabilities
 - 📄 Integration of **PDF and web scraping** for richer context
 
 ---

@@ -9,5 +9,5 @@ class ConversationMemory:
             "assistant_response": assistant_response
         })
 
-    def get_recent_history(self, n=5):
+    def get_recent_history(self, n=20):
         return self.history[-n:]

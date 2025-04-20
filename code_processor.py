@@ -1,7 +1,7 @@
 # code_processor.py
 from pathlib import Path
 
-def get_code_chunks(repo_path, extensions=(".py", ".js", ".ts"), chunk_size=500):
+def get_code_chunks(repo_path, extensions=(".py", ".js", ".ts",".md"), chunk_size=500):
     chunks = []
     for file_path in Path(repo_path).rglob("*"):
         if file_path.suffix in extensions:

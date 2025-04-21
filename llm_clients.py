@@ -4,6 +4,7 @@ import re
 import os
 from file_operations import RepoFileManager, FileOperationError
 
+# needs improvement
 def extract_file_updates(response: str) -> list:
     """
     Extract file updates from the LLM response.
@@ -84,12 +85,12 @@ def ask_llm(context, prompt, repo_path, model="llama"):
     else:
         return f"Unknown model: {model}"
 
-    # Handle file updates
+    # Handle file updates # needs improvement
     for file_path, content in extract_file_updates(response_text):
         try:
             file_manager.safe_write_to_file(file_path, content)
         except FileOperationError as e:
-            print(f"✗ Failed to update file: {file_path}")
+            print(f" Failed to update file: {file_path}")
             response_text += f"\n\nError updating {file_path}: {str(e)}"
 
     return response_text

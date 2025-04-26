@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from typing import Optional
+import difflib
+import hashlib
 
 class FileOperationError(Exception):
     """Custom exception for file operation errors"""
@@ -30,7 +32,6 @@ class RepoFileManager:
         return abs_path
 
     def validate_path(self, file_path: str) -> str:
-
         abs_path = self.get_absolute_path(file_path)
 
         # Check if path is within repository
@@ -52,9 +53,59 @@ class RepoFileManager:
         return abs_path
 
     def safe_write_to_file(self, file_path: str, content: str) -> bool:
+        """
+        Safely write content to a file within the repository.
+
+        - Validates the path
+        - Creates parent directories if needed
+        - Shows a diff if the file already exists
+        - Handles encoding issues
+        - Prevents accidental writes to critical system files
+
+        Args:
+            file_path: Path to the file (absolute or relative to repo)
+            content: Content to write to the file
+
+        Returns:
+            bool: True if write was successful
+
+        Raises:
+            FileOperationError: If write operation cannot be performed safely
+        """
         try:
             # Validate and normalize path
             abs_path = self.validate_path(file_path)
+
+            # Additional safety checks for critical files
+            if any(keyword in abs_path.lower() for keyword in [
+                'passwd', 'shadow', 'hosts', 'sudoers', '.ssh', '.aws',
+                '.env', 'credential', '.git', '.github'
+            ]):
+                raise FileOperationError(f"Cannot modify potentially sensitive file: {abs_path}")
+
+            # Check if this would overwrite an existing file
+            existing_content = None
+            if os.path.exists(abs_path):
+                try:
+                    with open(abs_path, 'r', encoding='utf-8') as f:
+                        existing_content = f.read()
+
+                    # If content is identical, no need to write
+                    if existing_content == content:
+                        print(f" No changes needed for file: {abs_path}")
+                        return True
+
+                    # Generate and log the diff
+                    diff = difflib.unified_diff(
+                        existing_content.splitlines(keepends=True),
+                        content.splitlines(keepends=True),
+                        fromfile=f"a/{os.path.basename(abs_path)}",
+                        tofile=f"b/{os.path.basename(abs_path)}"
+                    )
+                    print(f"\nChanges for {abs_path}:\n{''.join(diff)}")
+                except UnicodeDecodeError:
+                    # If we can't read the existing file as text, just note that we'll overwrite binary
+                    print(f" Warning: Overwriting possibly binary file: {abs_path}")
 
             # Create directory if it doesn't exist
             directory = os.path.dirname(abs_path)
@@ -62,10 +113,12 @@ class RepoFileManager:
                 Path(directory).mkdir(parents=True, exist_ok=True)
 
             # Write the content to the file
-            with open(abs_path, 'w') as f:
+            with open(abs_path, 'w', encoding='utf-8') as f:
                 f.write(content)
 
-            print(f" Successfully wrote to file: {abs_path}")
+            # Generate file hash for verification
+            content_hash = hashlib.md5(content.encode('utf-8')).hexdigest()
+            print(f" Successfully wrote to file: {abs_path} (MD5: {content_hash})")
             return True
 
         except FileOperationError:
@@ -80,6 +133,13 @@ class RepoFileManager:
 
             # Read and return file content
             with open(abs_path, 'r') as f:
+                return f.read()
+
+        except FileOperationError:
+            raise
+        except FileNotFoundError:
+            return None
+        except Exception as e:
                 return f.read()
 
         except FileOperationError:

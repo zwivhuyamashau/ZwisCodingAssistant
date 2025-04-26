@@ -26,7 +26,12 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
    ```
 
 2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-3. Run the CLI:
+3. (Optional) Choose your language model:
+   Set LLM_MODEL to either "llama" or "claude".
+
+4. (Optional) If using Claude, specify your model:
+   Set MODEL_INFERENCE_ID.
+5. Run the CLI:
    ```bash
    python cli_main.py
    ```
@@ -43,7 +48,13 @@ Zwi Coding Assistant is a Python-based AI assistant designed to help users under
    ```
 
 2. Set the environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
-3. Launch the Streamlit app:
+3. (Optional) Choose your language model:
+   Set LLM_MODEL to either "llama" or "claude".
+
+4. (Optional) If using Claude, specify your model:
+   Set MODEL_INFERENCE_ID.
+
+5. Launch the Streamlit app:
    ```bash
    streamlit run streamlit_main.py
    ```
